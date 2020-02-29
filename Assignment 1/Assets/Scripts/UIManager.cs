@@ -6,6 +6,22 @@ using System.Runtime.InteropServices;
 
 public class UIManager : MonoBehaviour
 {
+    #region SingletonCode
+    private static UIManager _instance;
+    public static UIManager Instance { get { return _instance; } }
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+    }
+    //single pattern ends here
+    #endregion
     public GameObject ConnectScreen;
     public GameObject Lobby;
     public GameObject JoinPlayer;
@@ -31,6 +47,8 @@ public class UIManager : MonoBehaviour
     private bool inGame = false;
     //private bool fieldFilled = false;
 
+    public 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -54,7 +72,6 @@ public class UIManager : MonoBehaviour
         }
 
 
-        if (isConnected) { Debug.Log("Connection Successful"); }
     }
 
     public void Connect()
@@ -63,16 +80,25 @@ public class UIManager : MonoBehaviour
         {
             NetworkManager.ConnectToServer(IpField.text, UsernameField.text);
             /*
-            if (NetworkManager.connected)
-            {
-                ConnectScreen.SetActive(false);
-                Lobby.SetActive(true);
-                ConnectedPlayers.SetActive(true);
-                isConnected = true;
-                inLobby = true;
-            }
+            
             */
         }
+    }
+
+    public void connectTest()
+    {
+
+       ConnectScreen.SetActive(false);
+       Lobby.SetActive(true);
+       ConnectedPlayers.SetActive(true);
+       isConnected = true;
+       inLobby = true;
+    
+    }
+
+    public void players(string playerData)
+    {
+        PlayerList.text = playerData;
     }
 
     void LobbyScreen()

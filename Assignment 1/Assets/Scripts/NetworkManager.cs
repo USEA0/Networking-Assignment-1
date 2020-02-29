@@ -72,7 +72,7 @@ public class NetworkManager : MonoBehaviour
 
     #endregion
 
-
+    public static bool connectFlag = false;
     //if the player is in a game(chat)
     public static bool inGame = false;
 
@@ -126,7 +126,10 @@ public class NetworkManager : MonoBehaviour
     static void OnConnect()
     {
         connected = true;
+        connectFlag = true;
         playerNumber = GetPlayerNumber(Client);
+    
+        Debug.Log("Connected");
     }
 
 
@@ -155,9 +158,24 @@ public class NetworkManager : MonoBehaviour
             lock (ActiveLobby)
             {
                 //TODO:update current lobby
+                StringBuilder playerData = new StringBuilder();
 
+                foreach(PlayerProfile player in ActiveLobby)
+                {
+                    playerData.Append(player.username);
+                    if(player.inGame)
+                    {
+                        playerData.Append("Busy – Playing a game");
+                    }
+                    else
+                    {
+                        playerData.Append("Avaliable");
+                    }
+                    playerData.Append("\n");
 
+                }
 
+                UIManager.Instance.players(playerData.ToString());
 
             }
             lobbyUpdated = false;
@@ -181,13 +199,18 @@ public class NetworkManager : MonoBehaviour
         if (responseEvent) { OnRequestResponse(inGame); }
         if (requestEvent) { OnGameRequest(requesterIndex, requestUsername); }
         if (gameEntryEvent) { OnGameEntry(); }
+
+        if (connectFlag)
+        {
+            UIManager.Instance.connectTest();
+            connectFlag = false;
+        }
     }
 
 
     //call for updates here
     void TickUpdate()
     {
-        Debug.Log("Ticked");
 
         //request data from server
         if (inGame) { RequestLobbyData(); } else { RequestSessionData(); }
