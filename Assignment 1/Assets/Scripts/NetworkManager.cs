@@ -27,6 +27,12 @@ public enum PacketType
     ERROR_PACKET,
 }
 
+public class PlayerProfile {
+    public string username = "";
+    public int id = -1;
+    public bool inGame = false;
+}
+
 public class NetworkManager : MonoBehaviour
 {
 
@@ -63,6 +69,10 @@ public class NetworkManager : MonoBehaviour
     //connected status
     public static bool connected = false;
 
+
+    #endregion
+
+
     //if the player is in a game(chat)
     public static bool inGame = false;
 
@@ -70,9 +80,32 @@ public class NetworkManager : MonoBehaviour
     public static bool requestActive = false;
 
     //holds the last active requester index
-    public int requesterIndex = -1;
+    public static int requesterIndex = -1;
 
-    #endregion
+    //holds username of requester / requestee
+    public static string requestUsername = "";
+
+    //flags for request and response events
+    public static bool requestEvent = false;
+    public static bool responseEvent = false;
+    public static bool gameEntryEvent = false;
+
+    //queue for storing messages
+    public static Queue<string> MessageQueue = new Queue<string>();
+
+    //list for storing lobby information
+    public static List<PlayerProfile> ActiveLobby = new List<PlayerProfile>();
+    public static bool lobbyUpdated = false;
+
+    //list for storing session information
+    public static List<PlayerProfile> ActiveSession = new List<PlayerProfile>();
+    public static bool sessionUpdated = false;
+
+    //tick timestep
+    int fixedTimeStep = 0;
+    //tick delay
+    int tickDelay = 50;
+
 
     // Start is called before the first frame update
     void Awake()
@@ -96,6 +129,72 @@ public class NetworkManager : MonoBehaviour
         playerNumber = GetPlayerNumber(Client);
     }
 
+
+    //update loop
+    private void FixedUpdate()
+    {
+        #region Fixed Tick
+        ++fixedTimeStep;
+
+        if (fixedTimeStep >= tickDelay)
+        {
+            TickUpdate();
+            fixedTimeStep = 0;
+        }
+        #endregion
+
+        //process incomming packet updates here
+        lock (MessageQueue) {
+            //TODO:process all messages
+
+
+        }
+
+        if (lobbyUpdated)
+        {
+            lock (ActiveLobby)
+            {
+                //TODO:update current lobby
+
+
+
+
+            }
+            lobbyUpdated = false;
+        }
+
+        if (sessionUpdated)
+        {
+            lock (ActiveSession)
+            {
+                //TODO:update current active session
+
+
+
+
+            }
+            sessionUpdated = false;
+        }
+
+
+        //listen to events
+        if (responseEvent) { OnRequestResponse(); }
+        if (requestEvent) { OnGameRequest(); }
+        if (gameEntryEvent) { OnGameEntry(); }
+    }
+
+
+    //call for updates here
+    void TickUpdate()
+    {
+        Debug.Log("Ticked");
+
+        //request data from server
+        if (inGame) { RequestLobbyData(); } else { RequestSessionData(); }
+        
+    }
+
+
     //called on data recieve action, then process
     static void PacketRecieved(int type, int sender, string data)
     {
@@ -107,22 +206,103 @@ public class NetworkManager : MonoBehaviour
         switch ((PacketType)type) {
             //this recieves a message from another user
             case PacketType.MESSAGE:
+                if (parsedData.Length == 2)
+                {
+                    StringBuilder newString = new StringBuilder();
+
+                    newString.Append(parsedData[1]);
+                    newString.Append(": ");
+                    newString.Append(parsedData[0]);
+
+                    //send to queue
+                    MessageQueue.Enqueue(newString.ToString());
+                }
+                else {
+                    Debug.LogWarning("Packet: MESSAGE Length is invalid");
+                }
                 break;
 
              //this recieves a game request from another user
             case PacketType.REQUEST_GAME:
+                if (parsedData.Length == 1)
+                {
+                    requestActive = true;
+                    requesterIndex = sender;
+                    requestUsername = parsedData[0];
+                    requestEvent = true;
+                }
+                else {
+                    Debug.LogWarning("Packet: REQUEST_GAME Length is invalid");
+                }
                 break;
 
             //this recieves a response to a sent game request
             case PacketType.REQUEST_RESPONSE:
+                if (parsedData.Length == 2) {
+                    requestUsername = parsedData[1];
+
+                    if (parsedData[0] == "1") {
+                        inGame = true;
+                        gameEntryEvent = true;
+                    }
+                    else {
+                        inGame = false;
+                    }
+                    responseEvent = true;
+                }
+                else
+                {
+                    Debug.LogWarning("Packet: REQUEST_RESPONSE Length is invalid");
+                }
                 break;
 
             //this recieves all the server data from the lobby
             case PacketType.LOBBY_DATA:
+                lobbyUpdated = true;
+
+                List<PlayerProfile> newLobby = new List<PlayerProfile>();
+
+                //setup lobby data updates
+                for (int counter = 0; counter < parsedData.Length / 3; counter++) {
+                    PlayerProfile tempProfile = new PlayerProfile();
+
+                    //setup profile
+                    tempProfile.id = int.Parse(parsedData[0 + counter]);
+                    tempProfile.username = parsedData[1 + counter];
+                    tempProfile.inGame = bool.Parse(parsedData[2 + counter]);
+
+                    //add to lobby
+                    newLobby.Add(tempProfile);
+                }
+
+                //replace old lobby with new
+                ActiveLobby = newLobby;
+
                 break;
 
             //this recieves all the session data from the lobby
             case PacketType.SESSION_DATA:
+                sessionUpdated = true;
+
+                List<PlayerProfile> newSession = new List<PlayerProfile>();
+
+                //setup lobby data updates
+                for (int counter = 0; counter < parsedData.Length / 3; counter++)
+                {
+                    PlayerProfile tempProfile = new PlayerProfile();
+
+                    //setup profile
+                    tempProfile.id = int.Parse(parsedData[0 + counter]);
+                    tempProfile.username = parsedData[1 + counter];
+                    tempProfile.inGame = bool.Parse(parsedData[2 + counter]);
+
+                    //add to lobby
+                    newSession.Add(tempProfile);
+                }
+
+                //replace old lobby with new
+                ActiveSession = newSession;
+
                 break;
             default:
                 Debug.Log("Unexpected Datatype Recieved");
@@ -144,6 +324,80 @@ public class NetworkManager : MonoBehaviour
     {
         //clean up client
         DeleteClient(Client);
+    }
+
+    public static void OnGameRequest() {
+        requestEvent = false;
+        //TODO: Process game request event
+
+    }
+    public static void OnRequestResponse()
+    {
+        responseEvent = false;
+        //TODO: Process request response event
+
+    }
+    public static void OnGameEntry() {
+        gameEntryEvent = false;
+        //TODO: Process game entry
+
+    }
+
+
+    //TODO: call this to request a game from player of index
+    public static void RequestGame(int index)
+    {
+        SendData((int)PacketType.REQUEST_GAME, index.ToString() , true, Client);
+    }
+
+    //TODO: call this to respond to a game request
+    public static void RespondToRequest(bool acceptance)
+    {
+        if (!inGame)
+        {
+            requestActive = false;
+
+            //join the game on local
+            if (acceptance)
+            {
+                inGame = true;
+                gameEntryEvent = true;
+            }
+
+            SendData((int)PacketType.REQUEST_RESPONSE, requesterIndex.ToString() + "," + acceptance.ToString(), true, Client);
+        }
+        else
+        {
+            Debug.LogWarning("Already in a game");
+        }
+
+
+    }
+
+    //TODO: call this to quit the game
+    public static void QuitGame()
+    {
+        if (inGame)
+        {
+            SendData((int)PacketType.GAME_QUIT, "", true, Client);
+            inGame = false;
+        }
+        else
+        {
+            Debug.LogWarning("Not in game");
+        }
+
+    }
+
+    public static void RequestLobbyData()
+    {
+        SendData((int)PacketType.LOBBY_DATA, "", true, Client);
+
+    }
+    public static void RequestSessionData()
+    {
+        SendData((int)PacketType.LOBBY_DATA, "", true, Client);
+
     }
 
 }
