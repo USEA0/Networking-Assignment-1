@@ -52,6 +52,7 @@ public class UIManager : MonoBehaviour
 
     //chat
     public InputField chatText;
+    public Text chatLog;
 
     public GameState state = GameState.InStart;
 

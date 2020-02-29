@@ -150,7 +150,7 @@ public class NetworkManager : MonoBehaviour
         lock (MessageQueue) {
             //TODO:process all messages
             if (MessageQueue.Count > 0) {
-                UIManager.Instance.chatText.text += MessageQueue.Dequeue() + "/n";
+                UIManager.Instance.chatLog.text += MessageQueue.Dequeue() + "/n";
             }
 
         }
@@ -201,6 +201,7 @@ public class NetworkManager : MonoBehaviour
     //called on data recieve action, then process
     static void PacketRecieved(int type, int sender, string data)
     {
+        Debug.Log(data);
         data.TrimEnd();
 
         //parse the data
@@ -364,7 +365,7 @@ public class NetworkManager : MonoBehaviour
         if (!inGame)
         {
             requestActive = false;
-
+            Debug.Log("Responded");
             //join the game on local
             if (acceptance)
             {
