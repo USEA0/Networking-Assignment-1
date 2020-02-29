@@ -44,14 +44,7 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!isConnected)
-        {
-            if(IpField.text != "" && UsernameField.text != "")
-            {
-                JoinButton.onClick.AddListener(Connect);
-            }
-        }
-        else if(inLobby)
+        if(inLobby)
         {
             LobbyScreen();
         }
@@ -59,14 +52,17 @@ public class UIManager : MonoBehaviour
         {
             ChatScreen();
         }
-        
+
+
+        if (isConnected) { Debug.Log("Connection Successful"); }
     }
 
-    void Connect()
+    public void Connect()
     {
-        if (!isConnected)
+        if (!isConnected && IpField.text != "" && UsernameField.text != "")
         {
             NetworkManager.ConnectToServer(IpField.text, UsernameField.text);
+            /*
             if (NetworkManager.connected)
             {
                 ConnectScreen.SetActive(false);
@@ -75,7 +71,7 @@ public class UIManager : MonoBehaviour
                 isConnected = true;
                 inLobby = true;
             }
-            
+            */
         }
     }
 

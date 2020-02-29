@@ -269,7 +269,15 @@ public class NetworkManager : MonoBehaviour
                     //setup profile
                     tempProfile.id = int.Parse(parsedData[0 + counter]);
                     tempProfile.username = parsedData[1 + counter];
-                    tempProfile.inGame = bool.Parse(parsedData[2 + counter]);
+
+                    if (parsedData[2 + counter] == "1")
+                    {
+                        tempProfile.inGame = true;
+                    }
+                    else
+                    {
+                        tempProfile.inGame = false;
+                    };
 
                     //add to lobby
                     newLobby.Add(tempProfile);
