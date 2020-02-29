@@ -163,15 +163,16 @@ public class NetworkManager : MonoBehaviour
                 foreach(PlayerProfile player in ActiveLobby)
                 {
                     playerData.Append(player.username);
-                    if(player.inGame)
+                    playerData.Append("\n");
+                    if (player.inGame)
                     {
-                        playerData.Append("Busy – Playing a game");
+                        playerData.Append("Status: Busy – Playing a game");
                     }
                     else
                     {
-                        playerData.Append("Avaliable");
+                        playerData.Append("Statis: Avaliable");
                     }
-                    playerData.Append("\n");
+                    playerData.Append("\n\n");
 
                 }
 
@@ -290,10 +291,10 @@ public class NetworkManager : MonoBehaviour
                     PlayerProfile tempProfile = new PlayerProfile();
 
                     //setup profile
-                    tempProfile.id = int.Parse(parsedData[0 + counter]);
-                    tempProfile.username = parsedData[1 + counter];
+                    tempProfile.id = int.Parse(parsedData[0 + counter*3]);
+                    tempProfile.username = parsedData[1 + counter*3];
 
-                    if (parsedData[2 + counter] == "1")
+                    if (parsedData[2 + counter*3] == "1")
                     {
                         tempProfile.inGame = true;
                     }

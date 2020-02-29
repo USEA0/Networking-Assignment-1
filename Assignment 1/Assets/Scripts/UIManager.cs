@@ -26,7 +26,8 @@ public class UIManager : MonoBehaviour
     public GameObject Lobby;
     public GameObject JoinPlayer;
     public GameObject GameChat;
-    public GameObject ConnectedPlayers;
+    public GameObject[] ConnectedPlayers;
+    public GameObject[] JoinPlayerButton;
 
     public Text LobbyLog;
     public Text JoinPlayerText;
@@ -56,7 +57,14 @@ public class UIManager : MonoBehaviour
         Lobby.SetActive(false);
         JoinPlayer.SetActive(false);
         GameChat.SetActive(false);
-        ConnectedPlayers.SetActive(false);
+        foreach (GameObject Connected in ConnectedPlayers)
+        {
+            Connected.SetActive(false);
+        }
+        foreach(GameObject ButtonJoin in JoinPlayerButton)
+        {
+            ButtonJoin.SetActive(false);
+        }
     }
 
     // Update is called once per frame
@@ -79,26 +87,30 @@ public class UIManager : MonoBehaviour
         if (!isConnected && IpField.text != "" && UsernameField.text != "")
         {
             NetworkManager.ConnectToServer(IpField.text, UsernameField.text);
-            /*
-            
-            */
+
         }
     }
 
     public void connectTest()
     {
 
-       ConnectScreen.SetActive(false);
-       Lobby.SetActive(true);
-       ConnectedPlayers.SetActive(true);
-       isConnected = true;
-       inLobby = true;
-    
+        ConnectScreen.SetActive(false);
+        Lobby.SetActive(true);
+        ConnectedPlayers.SetActive(true);
+        isConnected = true;
+        inLobby = true;
+        LobbyLog.text += UsernameField.text;
+        LobbyLog.text += " has connected!\n";
     }
 
     public void players(string playerData)
     {
         PlayerList.text = playerData;
+    }
+
+    public void Join(int playerIndex)
+    {
+
     }
 
     void LobbyScreen()
