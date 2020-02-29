@@ -29,7 +29,7 @@ public class UIManager : MonoBehaviour
     private bool isConnected = false;
     private bool inLobby = false;
     private bool inGame = false;
-    private bool fieldFilled = false;
+    //private bool fieldFilled = false;
 
     // Start is called before the first frame update
     void Start()
@@ -66,11 +66,16 @@ public class UIManager : MonoBehaviour
     {
         if (!isConnected)
         {
-            ConnectScreen.SetActive(false);
-            Lobby.SetActive(true);
-            ConnectedPlayers.SetActive(true);
-            isConnected = true;
-            inLobby = true;
+            NetworkManager.ConnectToServer(IpField.text, UsernameField.text);
+            if (NetworkManager.connected)
+            {
+                ConnectScreen.SetActive(false);
+                Lobby.SetActive(true);
+                ConnectedPlayers.SetActive(true);
+                isConnected = true;
+                inLobby = true;
+            }
+            
         }
     }
 

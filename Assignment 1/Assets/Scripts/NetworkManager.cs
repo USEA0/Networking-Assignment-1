@@ -115,8 +115,8 @@ public class NetworkManager : MonoBehaviour
         SetupOnConnect(OnConnect);
     }
 
-    //call this to connect to server
-    public void ConnectToServer(string ip, string username)
+    //TODO call this to connect to server 
+    static public void ConnectToServer(string ip, string username)
     {
         Connect(ip, username, Client);
         StartUpdating(Client);
@@ -178,8 +178,8 @@ public class NetworkManager : MonoBehaviour
 
 
         //listen to events
-        if (responseEvent) { OnRequestResponse(); }
-        if (requestEvent) { OnGameRequest(); }
+        if (responseEvent) { OnRequestResponse(inGame); }
+        if (requestEvent) { OnGameRequest(requesterIndex, requestUsername); }
         if (gameEntryEvent) { OnGameEntry(); }
     }
 
@@ -326,12 +326,12 @@ public class NetworkManager : MonoBehaviour
         DeleteClient(Client);
     }
 
-    public static void OnGameRequest() {
+    public static void OnGameRequest(int requesterIndex, string requesterUsername) {
         requestEvent = false;
         //TODO: Process game request event
 
     }
-    public static void OnRequestResponse()
+    public static void OnRequestResponse(bool response)
     {
         responseEvent = false;
         //TODO: Process request response event
