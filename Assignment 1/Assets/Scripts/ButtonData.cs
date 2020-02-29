@@ -5,10 +5,10 @@ using UnityEngine.UI;
 
 public class ButtonData : MonoBehaviour
 {
-    PlayerProfile selfProfile;
-    Text selfText;
+    public PlayerProfile selfProfile;
+    public Text selfText;
 
-    public void Start()
+    public void Awake()
     {
         selfText = this.GetComponentInChildren<Text>();
     }

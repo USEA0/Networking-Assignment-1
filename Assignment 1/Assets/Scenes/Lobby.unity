@@ -263,6 +263,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &66369808
 GameObject:
   m_ObjectHideFlags: 0
@@ -789,6 +790,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &282933788
 GameObject:
   m_ObjectHideFlags: 0
@@ -1676,6 +1678,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &542004762
 GameObject:
   m_ObjectHideFlags: 0
@@ -1818,6 +1821,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &544344999
 GameObject:
   m_ObjectHideFlags: 0
@@ -2033,6 +2037,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &600790578
 GameObject:
   m_ObjectHideFlags: 0
@@ -2252,6 +2257,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &635206569
 GameObject:
   m_ObjectHideFlags: 0
@@ -3303,6 +3309,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!114 &998696246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3967,6 +3974,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &1240036356
 GameObject:
   m_ObjectHideFlags: 0
@@ -4186,6 +4194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &1298318381
 GameObject:
   m_ObjectHideFlags: 0
@@ -4559,6 +4568,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &1423365543
 GameObject:
   m_ObjectHideFlags: 0
@@ -4730,7 +4740,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1564528638
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4859,7 +4869,7 @@ MonoBehaviour:
   - {fileID: 564416872}
   - {fileID: 998696245}
   joinGameText: {fileID: 1306211950}
-  chatText: {fileID: 0}
+  chatText: {fileID: 1191514881}
   state: 0
 --- !u!4 &1611538936
 Transform:
@@ -5146,6 +5156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &1696495672
 GameObject:
   m_ObjectHideFlags: 0
@@ -5581,6 +5592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &1838731400
 GameObject:
   m_ObjectHideFlags: 0
@@ -5723,6 +5735,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &1850323109
 GameObject:
   m_ObjectHideFlags: 0
@@ -6173,6 +6186,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &1969655639
 GameObject:
   m_ObjectHideFlags: 0
@@ -6535,6 +6549,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}
 --- !u!1 &2031258572
 GameObject:
   m_ObjectHideFlags: 0
@@ -6883,3 +6898,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f685a7889a6a0a2489ac5f04a24efac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfText: {fileID: 0}

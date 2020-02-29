@@ -243,7 +243,7 @@ public class NetworkManager : MonoBehaviour
             case PacketType.REQUEST_RESPONSE:
                 if (parsedData.Length == 2) {
                     requestUsername = parsedData[1];
-
+                    Debug.Log(parsedData[0] + " response");
                     if (parsedData[0] == "1") {
                         inGame = true;
                         RequestSessionData();
@@ -371,9 +371,14 @@ public class NetworkManager : MonoBehaviour
                 RequestSessionData();
                 inGame = true;
                 gameEntryEvent = true;
+                SendData((int)PacketType.REQUEST_RESPONSE, requesterIndex.ToString() + ",1" , true, Client);
+            }
+            else
+            {
+                SendData((int)PacketType.REQUEST_RESPONSE, requesterIndex.ToString() + ",0", true, Client);
             }
 
-            SendData((int)PacketType.REQUEST_RESPONSE, requesterIndex.ToString() + "," + acceptance.ToString(), true, Client);
+            
         }
         else
         {
