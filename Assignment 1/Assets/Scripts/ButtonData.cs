@@ -1,12 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ButtonData : MonoBehaviour
 {
-    public int index;
-    public void onClick()
+    PlayerProfile selfProfile;
+    Text selfText;
+
+    public void Start()
     {
-        UIManager.Instance.Join(index);
+        selfText = this.GetComponentInChildren<Text>();
+    }
+
+    public void Setup(PlayerProfile profile) {
+        selfProfile = profile;
+
+        if (selfProfile.inGame) {
+            selfText.text = selfProfile.username + ": In-Game";
+        }
+        else
+        {
+            selfText.text = selfProfile.username + ": Avaliable";
+        }
+    }
+
+    public void OnClick() {
+        NetworkManager.RequestGame(selfProfile.id);
+        UIManager.Instance.LobbyLog.text += "Requesting Game from player: " + selfProfile.username;
     }
 }

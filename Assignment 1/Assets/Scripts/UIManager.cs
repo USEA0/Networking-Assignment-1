@@ -4,6 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Runtime.InteropServices;
 
+public enum GameState { 
+    InStart,
+    InLobby,
+    InGame,
+}
+
 public class UIManager : MonoBehaviour
 {
     #region SingletonCode
@@ -22,33 +28,32 @@ public class UIManager : MonoBehaviour
     }
     //single pattern ends here
     #endregion
+
+    //Game Screens
     public GameObject ConnectScreen;
     public GameObject Lobby;
     public GameObject JoinPlayer;
     public GameObject GameChat;
-    public GameObject[] ConnectedPlayers;
-    public GameObject[] JoinPlayerButton;
+    public GameObject ConnectedPlayers;
 
-    public Text LobbyLog;
-    public Text JoinPlayerText;
-    public Text PlayerList;
-    public Text Chat;
-
+    //start widgets
     public InputField IpField;
     public InputField UsernameField;
-    public InputField ChatField;
-
     public Button JoinButton;
-    public Button AcceptPlayerButton;
-    public Button RejectPlayerButton;
-    public Button LeaveGameButton;
 
-    private bool isConnected = false;
-    private bool inLobby = false;
-    private bool inGame = false;
-    //private bool fieldFilled = false;
+    //lobby widgets
+    public Text LobbyLog;
 
-    public 
+    //connected players
+    public ButtonData[] allButtons;
+
+    //join player
+    public Text joinGameText;
+
+    //chat
+    public InputField chatText;
+
+    public GameState state = GameState.InStart;
 
     // Start is called before the first frame update
     void Start()
@@ -57,77 +62,125 @@ public class UIManager : MonoBehaviour
         Lobby.SetActive(false);
         JoinPlayer.SetActive(false);
         GameChat.SetActive(false);
-        foreach (GameObject Connected in ConnectedPlayers)
-        {
-            Connected.SetActive(false);
-        }
-        foreach(GameObject ButtonJoin in JoinPlayerButton)
-        {
-            ButtonJoin.SetActive(false);
+        ConnectedPlayers.SetActive(false);
+        state = GameState.InStart;
+
+        foreach (ButtonData button in allButtons) {
+            button.gameObject.SetActive(false);
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(inLobby)
-        {
-            LobbyScreen();
-        }
-        else if(inGame)
-        {
-            ChatScreen();
-        }
+        switch (state) {
+            case GameState.InStart:
+                if (!ConnectScreen.activeSelf)
+                {
+                    ConnectScreen.SetActive(true);
+                    Lobby.SetActive(false);
+                    GameChat.SetActive(false);
+                    ConnectedPlayers.SetActive(false);
+                }
+                break;
 
+            case GameState.InLobby:
+                if (!Lobby.activeSelf)
+                {
+                    ConnectScreen.SetActive(false);
+                    Lobby.SetActive(true);
+                    GameChat.SetActive(false);
+                    ConnectedPlayers.SetActive(true);
+                }
 
+                break;
+
+            case GameState.InGame:
+                if (!GameChat.activeSelf)
+                {
+                    ConnectScreen.SetActive(false);
+                    Lobby.SetActive(false);
+                    GameChat.SetActive(true);
+                    ConnectedPlayers.SetActive(true);
+                }
+                break;
+
+            default:
+                break;
+        }
     }
 
+    //sets all connected players
+    public void SetConnectedPlayers(List<PlayerProfile> players) {
+
+        //reset buttons
+        foreach (ButtonData button in allButtons)
+        {
+            button.gameObject.SetActive(false);
+        }
+
+        for (int counter = 0; counter < players.Count; counter++) {
+            allButtons[counter].gameObject.SetActive(true);
+            allButtons[counter].Setup(players[counter]);
+
+            if (counter == NetworkManager.playerNumber) {
+                allButtons[counter].gameObject.GetComponent<Button>().interactable = false;
+            }
+        }
+    }
+
+    //connects to server
     public void Connect()
     {
-        if (!isConnected && IpField.text != "" && UsernameField.text != "")
+        if (!NetworkManager.connected && IpField.text != "" && UsernameField.text != "")
         {
             NetworkManager.ConnectToServer(IpField.text, UsernameField.text);
-
         }
     }
 
-    public void connectTest()
+    //connection is confirmed
+    public void ConfirmConnection()
     {
+        state = GameState.InLobby;
 
-        ConnectScreen.SetActive(false);
-        Lobby.SetActive(true);
-        ConnectedPlayers.SetActive(true);
-        isConnected = true;
-        inLobby = true;
         LobbyLog.text += UsernameField.text;
         LobbyLog.text += " has connected!\n";
     }
 
-    public void players(string playerData)
-    {
-        PlayerList.text = playerData;
+    public void SetupRequest(string userName) {
+        JoinPlayer.SetActive(true);
+        joinGameText.text = userName + " requests a game.";
     }
 
-    public void Join(int playerIndex)
+    public void GoToChat()
     {
+        state = GameState.InGame;
+    }
+
+    public void Denied() {
+        LobbyLog.text += "User Request for game was denied";
+    }
+
+    public void QuitGame() {
+        NetworkManager.QuitGame();
+        state = GameState.InLobby;
+    }
+
+    public void JoinGame() {
+        NetworkManager.RespondToRequest(true);
+        state = GameState.InGame;
+        JoinPlayer.SetActive(false);
+    }
+    public void RejectGame() {
+        NetworkManager.RespondToRequest(false);
+        LobbyLog.text += "Rejected game";
+        JoinPlayer.SetActive(false);
+    }
+
+    public void OnSendMessage() {
+        NetworkManager.OnSendMessage(chatText.text);
+        chatText.text = "";
 
     }
 
-    void LobbyScreen()
-    {
-        
-    }
-
-    void ChatScreen()
-    {
-        if (ChatField.text != "")
-        {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                string temp = ChatField.text;
-                Debug.Log(temp);
-                ChatField.text = "";
-            }
-        }
-    }
 }

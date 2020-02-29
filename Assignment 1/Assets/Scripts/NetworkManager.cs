@@ -64,7 +64,7 @@ public class NetworkManager : MonoBehaviour
     public string ip;
 
     //local player number
-    private static int playerNumber = -1;
+    public static int playerNumber = -1;
 
     //connected status
     public static bool connected = false;
@@ -149,7 +149,9 @@ public class NetworkManager : MonoBehaviour
         //process incomming packet updates here
         lock (MessageQueue) {
             //TODO:process all messages
-
+            if (MessageQueue.Count > 0) {
+                UIManager.Instance.chatText.text += MessageQueue.Dequeue() + "/n";
+            }
 
         }
 
@@ -157,27 +159,7 @@ public class NetworkManager : MonoBehaviour
         {
             lock (ActiveLobby)
             {
-                //TODO:update current lobby
-                StringBuilder playerData = new StringBuilder();
-
-                foreach(PlayerProfile player in ActiveLobby)
-                {
-                    playerData.Append(player.username);
-                    playerData.Append("\n");
-                    if (player.inGame)
-                    {
-                        playerData.Append("Status: Busy – Playing a game");
-                    }
-                    else
-                    {
-                        playerData.Append("Statis: Avaliable");
-                    }
-                    playerData.Append("\n\n");
-
-                }
-
-                UIManager.Instance.players(playerData.ToString());
-
+                UIManager.Instance.SetConnectedPlayers(ActiveLobby);
             }
             lobbyUpdated = false;
         }
@@ -186,10 +168,7 @@ public class NetworkManager : MonoBehaviour
         {
             lock (ActiveSession)
             {
-                //TODO:update current active session
-
-
-
+                UIManager.Instance.SetConnectedPlayers(ActiveSession);
 
             }
             sessionUpdated = false;
@@ -203,7 +182,7 @@ public class NetworkManager : MonoBehaviour
 
         if (connectFlag)
         {
-            UIManager.Instance.connectTest();
+            UIManager.Instance.ConfirmConnection();
             connectFlag = false;
         }
     }
@@ -267,6 +246,7 @@ public class NetworkManager : MonoBehaviour
 
                     if (parsedData[0] == "1") {
                         inGame = true;
+                        RequestSessionData();
                         gameEntryEvent = true;
                     }
                     else {
@@ -346,9 +326,7 @@ public class NetworkManager : MonoBehaviour
     //send single string message to all others
     public static void OnSendMessage(string message)
     {
-        StringBuilder finalMessage = new StringBuilder();
-        finalMessage.Append(message);
-        SendData((int)PacketType.MESSAGE, finalMessage.ToString(), true, Client);
+        SendData((int)PacketType.MESSAGE, message, true, Client);
     }
 
     //call c++ cleanup
@@ -360,29 +338,27 @@ public class NetworkManager : MonoBehaviour
 
     public static void OnGameRequest(int requesterIndex, string requesterUsername) {
         requestEvent = false;
-        //TODO: Process game request event
+        UIManager.Instance.SetupRequest(requesterUsername);
 
     }
     public static void OnRequestResponse(bool response)
     {
         responseEvent = false;
-        //TODO: Process request response event
-
+        if (!response) {
+            UIManager.Instance.Denied();
+        }
     }
     public static void OnGameEntry() {
         gameEntryEvent = false;
-        //TODO: Process game entry
-
+        UIManager.Instance.GoToChat();
     }
 
 
-    //TODO: call this to request a game from player of index
     public static void RequestGame(int index)
     {
         SendData((int)PacketType.REQUEST_GAME, index.ToString() , true, Client);
     }
 
-    //TODO: call this to respond to a game request
     public static void RespondToRequest(bool acceptance)
     {
         if (!inGame)
@@ -392,6 +368,7 @@ public class NetworkManager : MonoBehaviour
             //join the game on local
             if (acceptance)
             {
+                RequestSessionData();
                 inGame = true;
                 gameEntryEvent = true;
             }
@@ -402,17 +379,15 @@ public class NetworkManager : MonoBehaviour
         {
             Debug.LogWarning("Already in a game");
         }
-
-
     }
 
-    //TODO: call this to quit the game
     public static void QuitGame()
     {
         if (inGame)
         {
             SendData((int)PacketType.GAME_QUIT, "", true, Client);
             inGame = false;
+            RequestLobbyData();
         }
         else
         {
@@ -431,5 +406,4 @@ public class NetworkManager : MonoBehaviour
         SendData((int)PacketType.LOBBY_DATA, "", true, Client);
 
     }
-
 }
