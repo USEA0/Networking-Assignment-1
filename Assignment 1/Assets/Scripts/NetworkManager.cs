@@ -150,7 +150,7 @@ public class NetworkManager : MonoBehaviour
         lock (MessageQueue) {
             //TODO:process all messages
             if (MessageQueue.Count > 0) {
-                UIManager.Instance.chatLog.text += MessageQueue.Dequeue() + "/n";
+                UIManager.Instance.chatLog.text += MessageQueue.Dequeue() + "\n";
             }
 
         }
@@ -384,6 +384,7 @@ public class NetworkManager : MonoBehaviour
         else
         {
             Debug.LogWarning("Already in a game");
+            SendData((int)PacketType.REQUEST_RESPONSE, requesterIndex.ToString() + ",0", true, Client);
         }
     }
 
@@ -391,6 +392,8 @@ public class NetworkManager : MonoBehaviour
     {
         if (inGame)
         {
+            UIManager.Instance.LobbyLog.text = "";
+            UIManager.Instance.chatLog.text = "";
             SendData((int)PacketType.GAME_QUIT, "", true, Client);
             inGame = false;
             RequestLobbyData();
