@@ -121,6 +121,12 @@ void ServerNetwork::startUpdates()
 				pack.sender = -1;
 				relay(pack, false);
 			}
+			if (command == "/data") {
+				for (UserProfile profile : ConnectedUsers) {
+					cout << profile.Username + ":" + to_string(profile.inGame) + ":" 
+					+ to_string(profile.index) + ":" + to_string(profile.gameNumber) + ":" + to_string(profile.active) << endl;
+				}
+			}
 			if (command == "/testTCP") {
 				Packet pack;
 				pack.packet_type = MESSAGE;
@@ -340,6 +346,7 @@ void ServerNetwork::ProcessTCP(Packet pack)
 		if (ConnectedUsers[pack.sender].inGame) {
 			for (int index : ActiveGames[ConnectedUsers[pack.sender].gameNumber]) {
 				sendTo(pack, ConnectedUsers[index].tcpSocket);
+				cout << "Message send\n";
 			}
 		}
 		else {
@@ -350,15 +357,15 @@ void ServerNetwork::ProcessTCP(Packet pack)
 	case PacketType::REQUEST_GAME:
 		//send a request game packet to target
 		sendTo(createPacket(REQUEST_GAME, ConnectedUsers[pack.sender].Username, pack.sender), ConnectedUsers[stoi(parsedData[0])].tcpSocket );
-
+		cout << "Request sent\n";
 		break;
 	
 	case PacketType::REQUEST_RESPONSE:
 		//send response to target
 		sendTo(createPacket(REQUEST_RESPONSE, parsedData[1] + "," + ConnectedUsers[stoi(parsedData[0])].Username, pack.sender), ConnectedUsers[stoi(parsedData[0])].tcpSocket);
-		
+		cout << "Response send\n";
 		//enter the requester into a game with the sender
-		if (parsedData[0] == "1") {
+		if (parsedData[1] == "1") {
 			JoinGame(stoi(parsedData[0]), pack.sender);
 		}
 
@@ -370,15 +377,21 @@ void ServerNetwork::ProcessTCP(Packet pack)
 			//remove user from list
 			for (int counter = 0; counter < ActiveGames[ConnectedUsers[pack.sender].gameNumber].size(); counter++) {
 				if (ActiveGames[ConnectedUsers[pack.sender].gameNumber][counter] == pack.sender) {
-					ActiveGames[ConnectedUsers[pack.sender].gameNumber].erase(ActiveGames[ConnectedUsers[pack.sender].gameNumber].begin() + counter);
+					for (int x : ActiveGames[ConnectedUsers[pack.sender].gameNumber]) {
+						if (x != pack.sender) {
+							ConnectedUsers[x].gameNumber = -1;
+							ConnectedUsers[x].inGame = false;
+						}
+
+					}
+					
 				}
 			}
+			ActiveGames.erase(ActiveGames.begin() + ConnectedUsers[pack.sender].gameNumber);
+			ConnectedUsers[pack.sender].gameNumber = -1;
 			
-			//remove list if empty
-			if (ActiveGames[ConnectedUsers[pack.sender].gameNumber].empty()) {
-				ActiveGames.erase(ActiveGames.begin() + ConnectedUsers[pack.sender].gameNumber);
-			}
 		}
+		
 		break;
 
 	case PacketType::SESSION_DATA:
@@ -424,7 +437,7 @@ void ServerNetwork::ProcessTCP(Packet pack)
 		break;
 
 	default:
-		cout << "Error: Unhandled Packet Type";
+		//cout << "Error: Unhandled Packet Type: TCP " << to_string(pack.packet_type) << endl;
 		break;
 	}
 
@@ -449,7 +462,7 @@ void ServerNetwork::ProcessUDP(Packet pack)
 
 		break;
 	default:
-		cout << "Error: Unhandled Packet Type";
+		//cout << "Error: Unhandled Packet Type: UDP " << to_string(pack.packet_type) <<  endl;
 		break;
 	}
 }
@@ -459,7 +472,7 @@ void ServerNetwork::JoinGame(int requester, int responder)
 	//if responder is in game, add requester to game
 	if (ConnectedUsers[responder].inGame) {
 		ConnectedUsers[requester].inGame = true;
-
+		ConnectedUsers[requester].gameNumber = ConnectedUsers[responder].gameNumber;
 		//find game that responder is in
 		for (vector<int> game : ActiveGames) {
 			for (int counter = 0; counter < game.size(); counter++) {
@@ -477,7 +490,8 @@ void ServerNetwork::JoinGame(int requester, int responder)
 		vector<int> newGame = { responder, requester };
 		ConnectedUsers[responder].gameNumber = ActiveGames.size();
 		ConnectedUsers[requester].gameNumber = ActiveGames.size();
-
+		ConnectedUsers[requester].inGame = true;
+		ConnectedUsers[responder].inGame = true;
 		//add to game to list
 		ActiveGames.push_back(newGame);
 	}
